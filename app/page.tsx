@@ -60,8 +60,8 @@ export default function HomePage() {
               />
           </DrawerModal>
           <ItemGroup className="grid grid-cols-3 gap-2">
-              {categories && categories.map((category) => {
-                  const percent = Math.min((category.totalSpent / category.limit) * 100, 100);
+              {categories && categories.map((category: CategoryItemProps) => {
+                  const percent = Math.min((category.totalSpent  ? category.totalSpent / category.limit : 0) * 100, 100);
 
                   return (
                       <Item key={category.id} variant="muted" className="relative overflow-hidden">

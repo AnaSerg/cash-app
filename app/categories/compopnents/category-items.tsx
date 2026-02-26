@@ -38,7 +38,7 @@ export function CategoryItems({onEdit, onDelete}: CategoryItem) {
     )
 }
 
-const CategoryItem = ({ category, onEdit, onDelete }: {  category: CategoryItemProps, onEdit: any, onDelete: any  }) => {
+const CategoryItem = ({ category, onEdit, onDelete }: {  category: CategoryItemProps, onEdit: (category: CategoryItemProps) => void, onDelete: (id: number) => void }) => {
     return (
         <Item variant="muted" className="relative">
             <ItemContent>

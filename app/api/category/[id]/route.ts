@@ -1,7 +1,7 @@
 import {prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
 
-export const PATCH = async (req: Request, { params }: { params: { id: string } }) => {
+export const PATCH = async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
     const body = await req.json();
 
@@ -18,7 +18,7 @@ export const PATCH = async (req: Request, { params }: { params: { id: string } }
     return NextResponse.json(updatedCategory, { status: 200 });
 };
 
-export const DELETE = async (req: Request, { params }: { params: { id: string } }) => {
+export const DELETE = async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
     const deletedCategory = await prisma.category.delete({
         where: { id: Number(id) },

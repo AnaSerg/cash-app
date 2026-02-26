@@ -2,6 +2,6 @@ export type CategoryItemProps = {
     id: number;
     name: string;
     limit: number;
-    remaining: number;
-    totalSpent: number;
+    remaining?: number;
+    totalSpent?: number;
 }
