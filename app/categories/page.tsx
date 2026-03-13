@@ -13,7 +13,7 @@ import {CategoryItemProps} from "@/app/categories/types";
 export default function Categories() {
     const [isDrawerOpen, setDrawerOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState<CategoryItemProps | null>(null);
-    const { addCategory, deleteCategory, editCategory } = useCategoryApi();
+    const { addCategory, archiveCategory, editCategory } = useCategoryApi();
     const { categoryFormFields } = useCategoryFields();
 
     const submitAdd = async (data: CategoryItemProps) => {
@@ -33,6 +33,7 @@ export default function Categories() {
                 id: editingCategory?.id,
                 name: data.name,
                 limit: Number(data.limit),
+                archived: true
             });
             setDrawerOpen(false);
         } catch (error) {
@@ -52,7 +53,7 @@ export default function Categories() {
 
     const handleDelete = async (id: number) => {
         try {
-            await deleteCategory(id);
+            await archiveCategory(id);
         } catch (error) {
             console.error('Error adding category:', error);
         }
@@ -75,7 +76,7 @@ export default function Categories() {
                             id="categories"
                             submit={editingCategory ? submitEdit : submitAdd}
                             formFields={categoryFormFields}
-                            defaultValues={editingCategory ? { name: editingCategory.name, limit: editingCategory.limit, category: "" } : { category: "" }}
+                            defaultValues={editingCategory ? { name: editingCategory.name, limit: editingCategory.limit } : { name: "", limit: "" }}
                         />
                     </DrawerModal>
                 </div>

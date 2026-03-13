@@ -5,7 +5,7 @@ import {CategoryItemProps} from "@/app/categories/types";
 export const useCategoryApi = () => {
     const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-    const { data: categories, error, isLoading } = useSWR(
+    const { data, error, isLoading } = useSWR(
         '/api/category',
         fetcher,
         {
@@ -24,8 +24,8 @@ export const useCategoryApi = () => {
         }
     );
 
-    const { trigger: deleteCategory } = useSWRMutation(
-        'delete-category',
+    const { trigger: archiveCategory } = useSWRMutation(
+        'archive-category',
         removeCategory,
         {
             onSuccess: () => {
@@ -44,16 +44,16 @@ export const useCategoryApi = () => {
         }
     );
 
-    return { addCategory, editCategory, deleteCategory, categories, error, isLoading };
+    return { addCategory, editCategory, archiveCategory, data, error, isLoading };
 }
 
-async function postCategory(_key: string, { arg }: { arg: CategoryItemProps }): Promise<void> {
+async function postCategory(_key: string, { arg }: { arg: { name: string; limit: number | string } }): Promise<void> {
     const res = await fetch('/api/category/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(arg),
+        body: JSON.stringify({ name: arg.name, limit: arg.limit }),
     });
 
     if (!res.ok) {
@@ -80,13 +80,13 @@ async function patchCategory(_key: string, { arg }: { arg: CategoryItemProps }):
 }
 
 async function removeCategory(_key: string, { arg }: { arg: number }): Promise<void> {
-    const res = await fetch(`/api/category/${arg}`, {
-        method: 'DELETE',
+    const res = await fetch(`/api/category/${arg}/archive`, {
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
         },
     });
 
-    if (!res.ok) throw new Error('Failed to delete category');
+    if (!res.ok) throw new Error('Failed to archive category');
     return res.json();
 }

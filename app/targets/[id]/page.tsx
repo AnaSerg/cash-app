@@ -12,7 +12,6 @@ export default async function TargetPage({
 
     return (
         <div>
-            <DashboardItem />
             <div className="flex gap-2 flex-wrap">
                 <div className="w-8 h-8 rounded-3xl bg-[#F39A60] drop-shadow-md" />
                 <div className="w-8 h-8 rounded-3xl bg-[#F39A60] drop-shadow-md" />

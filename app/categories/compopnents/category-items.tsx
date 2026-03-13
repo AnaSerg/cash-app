@@ -11,14 +11,14 @@ type CategoryItem = {
 }
 
 export function CategoryItems({onEdit, onDelete}: CategoryItem) {
-    const { categories, error, isLoading } = useCategoryApi();
+    const { data, error, isLoading } = useCategoryApi();
 
     // TODO: доделать страницу с лоадером
     if (isLoading) return <Spinner className="size-8" />
     // TODO: добавить всплывашку с ошибкой
     if (error) return <div>Error: {error.message}</div>
 
-    if (categories.length === 0) {
+    if (data.categories.length === 0) {
         return (
             <div className="flex gap-2 justify-center mt-12">
                 <Snail className="text-[#F39A60]"/>
@@ -30,8 +30,9 @@ export function CategoryItems({onEdit, onDelete}: CategoryItem) {
     return (
         <div className="flex w-full max-w-xl flex-col gap-6 mt-6">
             <ItemGroup className="grid grid-cols-3 gap-2">
-                {categories.map((category: CategoryItemProps) => (
-                        <CategoryItem key={category.name} category={category} onEdit={onEdit} onDelete={onDelete} />
+                {data.categories.map((category: CategoryItemProps) => (
+                    !category.archived &&
+                            <CategoryItem key={category.name} category={category} onEdit={onEdit} onDelete={onDelete} />
                 ))}
             </ItemGroup>
         </div>

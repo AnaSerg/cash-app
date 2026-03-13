@@ -4,28 +4,23 @@ import {CategoryItems} from "@/app/categories/compopnents/category-items";
 import {DashboardItem} from "@/app/ui/components/dashboard-item";
 import {Button} from "@/components/ui/button";
 import {DrawerModal} from "@/app/ui/components/drawer-modal";
-import Form, {FormField} from "@/app/ui/components/form";
 import {useCategoryApi} from "@/app/categories/hooks/use-category-api";
 import {Item, ItemContent, ItemDescription, ItemGroup} from "@/components/ui/item";
 import {useState} from "react";
 import {CategoryItemProps} from "@/app/categories/types";
 import {useExpenseApi} from "@/app/hooks/use-expense-api";
 import {useExpenseFields} from "@/app/hooks/use-expense-fields";
-
-const savingsFormFields: FormField[] = [
-    {
-        name: "sum",
-        type: "number",
-        required: true,
-        placeholder: "0"
-    }
-]
+import {ProgressBar} from "@/app/ui/components/progress-bar";
+import {Calculator} from "@/app/ui/components/calculator/calculator";
 
 export default function HomePage() {
-    const { categories, error, isLoading } = useCategoryApi();
+    const { data, error, isLoading } = useCategoryApi();
+    console.log(data);
     const [isDrawerOpen, setDrawerOpen] = useState(false);
     const { addExpense } = useExpenseApi();
     const { expenseFormFields } = useExpenseFields();
+
+    if (!data) return null;
 
     const submitAdd = async (data: CategoryItemProps) => {
         try {
@@ -40,11 +35,11 @@ export default function HomePage() {
     }
   return (
     <div>
-      <main className="mt-10 relative">
-          <div className="grid grid-cols-2 gap-3 fixed top-3 right-4 left-4">
+      <main className="mt-10 relative mb-20">
+          <div className="fixed bottom-0 right-4 left-4 z-20 bg-[linear-gradient(to_top,transparent,#e9e3df_65%)]">
+              <Button className="w-full mb-4" size="lg" onClick={handleAdd}>Потратить</Button>
           </div>
-          <DashboardItem />
-          <Button className="w-full" onClick={handleAdd}>Потратить</Button>
+          <DashboardItem totals={data.totals}/>
           <DrawerModal
               open={isDrawerOpen}
               onOpenChange={(open) => setDrawerOpen(open)}
@@ -52,27 +47,35 @@ export default function HomePage() {
               title="Добавить расход"
               id="expenses"
           >
-              <Form
-                  id="expenses"
-                  submit={submitAdd}
-                  formFields={expenseFormFields}
-                  defaultValues={{ expense: "" }}
-              />
+              <Calculator />
           </DrawerModal>
-          <ItemGroup className="grid grid-cols-3 gap-2">
-              {categories && categories.map((category: CategoryItemProps) => {
-                  const percent = Math.min((category.totalSpent  ? category.totalSpent / category.limit : 0) * 100, 100);
+          <ItemGroup className="grid grid-cols-2 gap-2">
+              {data && data.categories.map((category: CategoryItemProps) => {
+                  const percent = Math.min((category.totalSpent ? category.totalSpent / category.limit : 0) * 100, 100);
 
                   return (
-                      <Item key={category.id} variant="muted" className="relative overflow-hidden">
-                          <div
-                              className={`absolute bottom-0 left-0 right-0 transition-all duration-500 bg-[#D7D5D1]`}
-                              style={{ height: `${percent}%` }}
-                          />
-                          <ItemContent className="relative z-10">
-                              <ItemDescription className="text-center">{category.name}</ItemDescription>
-                              <h2 className="font-medium text-lg text-center">{category.remaining} ₽</h2>
-                              <p className="font-medium text-sm text-center text-muted-foreground">{category.totalSpent} ₽ / {category.limit} ₽</p>
+                      <Item key={category.id} className="relative overflow-hidden border-0 rounded-2xl p-4 bg-[#f5f4f2]">
+                          <ItemContent className="relative z-10 flex flex-col gap-3">
+
+                              <ItemDescription className="text-xs font-semibold uppercase tracking-wide opacity-60">
+                                  {category.name}
+                              </ItemDescription>
+
+                              <div>
+                                  <h2 className="text-2xl font-extrabold text-foreground leading-none">
+                                      {category.totalSpent?.toLocaleString()} ₽
+                                  </h2>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                      из {category.limit.toLocaleString()} ₽
+                                  </p>
+                              </div>
+
+                              <ProgressBar width={percent} size="small" />
+
+                              <p className="text-xs font-semibold text-muted-foreground">
+                                  {category.remaining?.toLocaleString()} ₽ осталось
+                              </p>
+
                           </ItemContent>
                       </Item>
                   );

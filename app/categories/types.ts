@@ -4,4 +4,5 @@ export type CategoryItemProps = {
     limit: number;
     remaining?: number;
     totalSpent?: number;
+    archived: boolean;
 }

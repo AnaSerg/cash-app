@@ -3,15 +3,13 @@ import {NextResponse} from "next/server";
 
 export const PATCH = async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
-    const body = await req.json();
 
-    const updatedCategory = await prisma.category.update({
+    const archivedCategory = await prisma.category.update({
         where: { id: Number(id) },
         data: {
-            name: body.name,
-            limit: Number(body.limit),
+            archived: true,
         }
     });
 
-    return NextResponse.json(updatedCategory, { status: 200 });
+    return NextResponse.json(archivedCategory, { status: 200 });
 };

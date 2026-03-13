@@ -1,12 +1,24 @@
+export function ProgressBar({ width, size, variant = "light" }: {
+    width: number;
+    size: "large" | "small";
+    variant?: "light" | "dark";
+}) {
+    const heightClass = size === "large" ? "h-2" : "h-1.5";
 
-export function ProgressBar() {
+    const trackClass = variant === "dark"
+        ? "bg-white/10"
+        : "bg-black/10";
+
+    const fillClass = variant === "dark"
+        ? "bg-emerald-400"
+        : "bg-black/40";
+
     return (
-        <div className='h-4 w-full bg-white rounded-2xl'>
+        <div className={`w-full rounded-full ${heightClass} ${trackClass}`}>
             <div
-                style={{ width: `50%`}}
-                className="h-full rounded-2xl bg-[#A7BE58]"
-            >
-            </div>
+                style={{ width: `${width}%` }}
+                className={`h-full rounded-full transition-all duration-300 ${fillClass}`}
+            />
         </div>
-    )
+    );
 }
