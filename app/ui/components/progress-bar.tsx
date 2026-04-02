@@ -13,10 +13,12 @@ export function ProgressBar({ width, size, variant = "light" }: {
         ? "bg-emerald-400"
         : "bg-black/40";
 
+    const progressBarWidth = width > 100 ? 100 : width;
+
     return (
         <div className={`w-full rounded-full ${heightClass} ${trackClass}`}>
             <div
-                style={{ width: `${width}%` }}
+                style={{ width: `${progressBarWidth}%` }}
                 className={`h-full rounded-full transition-all duration-300 ${fillClass}`}
             />
         </div>

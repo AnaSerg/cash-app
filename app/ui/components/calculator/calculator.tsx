@@ -1,17 +1,88 @@
+import { Badge } from "@/components/ui/badge"
+import {NumKeyboard} from "./components/num-keyboard";
+import {LetterKeyboard} from "./components/letter-keyboard";
+import {CalculatorInput} from "@/app/ui/components/calculator/components/calculator-input";
 import {useState} from "react";
-import {handlePress} from "./utils/handle-press";
+import {Button} from "@/components/ui/button";
+import {Plus} from "lucide-react";
 
-export const Calculator = () => {
-    const [value, setValue] = useState("");
-    const buttons = ["7","8","9","4","5","6","1","2","3",".","0","⌫"];
+export type Option = {
+    label: string;
+    value: string;
+}
+
+type CalculatorProps = {
+    fields: FieldConfig[];
+    options?: Option[];
+    validationMessage?: string | null;
+    selectedOption?: string | null;
+    onSelectedOptionChange?: (value: string | null) => void;
+}
+
+export type FieldConfig = {
+    key: string;
+    type: "num" | "letter";
+    value: string;
+    onChange: (value: string | ((prev: string) => string)) => void;
+    placeholder?: string;
+    label?: string;
+}
+
+export const Calculator = ({
+    options,
+    fields,
+    validationMessage,
+    selectedOption,
+    onSelectedOptionChange,
+}: CalculatorProps) => {
+    const [activeKey, setActiveKey] = useState(fields[0].key);
+    const activeField = fields.find(f => f.key === activeKey)!;
+
     return (
         <>
-            <p className="bg-[#f5f4f2] h-16 rounded-md flex items-center justify-end p-2 text-3xl mb-4">{value || 0} ₽</p>
-            <div className="grid grid-cols-3 gap-px bg-stone-200">
-                {buttons.map((btn, index) => (
-                    <button className="bg-white p-4 text-2xl" onClick={() => setValue(handlePress(value, btn))} key={index}>{btn}</button>
+            {fields.map(field => (
+                <CalculatorInput
+                    type={field.type}
+                    key={field.key}
+                    value={field.value}
+                    active={activeKey === field.key}
+                    onClick={() => setActiveKey(field.key)}
+                    placeholder={field.placeholder}
+                    label={field.label}
+                />
+            ))}
+            <div className="flex gap-2 overflow-x-auto pb-1 mt-4 mb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                {options?.map((option) => (
+                    <Badge
+                        key={option.value}
+                        onClick={() => onSelectedOptionChange?.(option.value)}
+                        className={`pt-2 pl-4 pb-2 pr-4 text-sm font-semibold cursor-pointer whitespace-nowrap flex-shrink-0 transition-colors ${
+                            selectedOption === option.value
+                                ? "bg-[#FAF09C]"
+                                : "bg-orange-50"
+                        }`}
+                    >
+                        {option.label}
+                    </Badge>
                 ))}
             </div>
+
+            <div className="flex-shrink-0">
+                {activeField.type === "num"
+                    ? <NumKeyboard value={activeField.value} onChange={activeField.onChange} />
+                    : <LetterKeyboard value={activeField.value} onChange={activeField.onChange} />
+                }
+            </div>
+
+            {validationMessage ? (
+                <p
+                    role="alert"
+                    aria-live="polite"
+                    className="text-sm font-medium text-red-900 mt-2"
+                >
+                    {validationMessage}
+                </p>
+            ) : null}
         </>
-    )
-}
+    );
+};

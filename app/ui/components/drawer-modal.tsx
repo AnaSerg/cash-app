@@ -1,6 +1,5 @@
 import {
     Drawer,
-    DrawerClose,
     DrawerContent,
     DrawerFooter,
     DrawerHeader,
@@ -9,29 +8,47 @@ import {
 import {Button} from "@/components/ui/button";
 import React from "react";
 
-type DrawerModalProps = {
-    title?: string;
+export interface DrawerModalProps {
     buttonText: string;
     children: React.ReactNode;
-    id?: string;
+    title?: string;
+    accessibilityTitle?: string;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
+    onSave?: () => void | Promise<void>;
+    saveDisabled?: boolean;
 }
 
-export function DrawerModal({open, onOpenChange, title, buttonText, children, id}: DrawerModalProps) {
+export function DrawerModal({
+    open,
+    onOpenChange,
+    onSave,
+    saveDisabled,
+    buttonText,
+    children,
+    title,
+    accessibilityTitle = "Диалоговое окно",
+}: DrawerModalProps) {
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
-            <DrawerContent className="bg-white">
+            <DrawerContent className="bg-[#D7D2F1] mt-0">
                 <DrawerHeader>
-                    {title && <DrawerTitle>{title}</DrawerTitle>}
+                    <DrawerTitle className={title ? "text-left" : "sr-only"}>
+                        {title ?? accessibilityTitle}
+                    </DrawerTitle>
                     {children}
                 </DrawerHeader>
                 <DrawerFooter>
-                    <DrawerClose asChild>
-                        <Button type="submit" form={id}>{buttonText}</Button>
-                    </DrawerClose>
+                    <Button
+                        className="h-12 bg-black text-white text-lg"
+                        type="button"
+                        disabled={saveDisabled}
+                        onClick={() => void onSave?.()}
+                    >
+                        {buttonText}
+                    </Button>
                 </DrawerFooter>
             </DrawerContent>
         </Drawer>
-    )
+    );
 }

@@ -18,9 +18,20 @@ model Category {
   name String @unique
   limit Int
   expenses Expense[]
+  subcategories Subcategory[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   archived Boolean @default(false)
+}
+
+model Subcategory {
+    id Int @id @default(autoincrement())
+    @@unique([categoryId, name])
+    categoryId Int
+    expenses Expense[]
+    category Category @relation(fields: [categoryId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Target {
@@ -35,10 +46,12 @@ model Target {
 model Expense {
   id Int @id @default(autoincrement())
   description String?
-  amount Int
+  amount Decimal @db.Decimal(14, 2)
   date DateTime @default(now())
   categoryId Int
+  subcategoryId Int?
   category Category @relation(fields: [categoryId], references: [id])
+  subcategory Subcategory? @relation(fields: [subcategoryId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

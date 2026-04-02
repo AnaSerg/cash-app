@@ -15,6 +15,10 @@ export default function RootLayout({ children }: { children: React.ReactNode; })
 
     return (
         <html lang="en">
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </head>
         <body className={`${manrope.className} antialiased mt-3 ml-4 mr-4`}>
             { !hideHeader && <Header /> }
             {children}

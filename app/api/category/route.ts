@@ -17,6 +17,7 @@ export const GET = async (req: Request) => {
                 id: true,
                 name: true,
                 limit: true,
+                subcategories: true,
                 expenses: {
                     where: {
                         createdAt: { gte: startOfMonth, lt: startOfNextMonth }
@@ -24,7 +25,7 @@ export const GET = async (req: Request) => {
                     select: {
                         amount: true
                     }
-                }
+                },
             }
         });
 
@@ -32,8 +33,9 @@ export const GET = async (req: Request) => {
             id: cat.id,
             name: cat.name,
             limit: cat.limit,
-            totalSpent: cat.expenses.reduce((sum, e) => sum + e.amount, 0),
-            remaining: cat.limit - cat.expenses.reduce((sum, e) => sum + e.amount, 0)
+            totalSpent: cat.expenses.reduce((sum, e) => sum + Number(e.amount), 0),
+            remaining: cat.limit - cat.expenses.reduce((sum, e) => sum + Number(e.amount), 0),
+            subcategories: cat.subcategories,
         }));
 
         const totals = {
@@ -64,6 +66,7 @@ export const POST = async (req: Request) => {
             data: {
                 name: body.name,
                 limit: Number(body.limit),
+                subcategories: body.subcategories,
             }
         });
 

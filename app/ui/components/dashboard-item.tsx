@@ -11,7 +11,7 @@ type spentInfoProps = {
 
 export function DashboardItem({ totals }: {totals: spentInfoProps}) {
     const { totalSpent, limit, remaining } = totals;
-    const progressBarWidth = totalSpent * 100 / limit;
+    const progressBarWidth = totalSpent * 100 / limit || 0;
     return (
         <Link href="/targets/123">
             <Item className="bg-stone-900 mb-6 drop-shadow-md border-0 rounded-2xl" variant="muted">

@@ -6,3 +6,8 @@ export type CategoryItemProps = {
     totalSpent?: number;
     archived: boolean;
 }
+
+export type Subcategory = {
+    id: number;
+    name: string;
+}
