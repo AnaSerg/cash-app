@@ -1,6 +1,6 @@
 import { useDrawerForm } from "@/app/hooks/use-drawer-form";
 import { parseAmountInput } from "@/app/lib/format-number-with-space";
-import { useCategoryApi } from "./use-category-api";
+import { useCategoryApi } from "./api/use-category-api";
 import { CategoryItemProps } from "@/app/categories/types";
 
 const validateCategoryFields = (fields: { name: string; limit: string }) => {

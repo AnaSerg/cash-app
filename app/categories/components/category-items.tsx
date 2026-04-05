@@ -5,7 +5,7 @@ import { Spinner } from "@/components/ui/spinner";
 import {Button} from "@/components/ui/button";
 import {Plus, Snail, Trash2, X} from "lucide-react";
 import {CategoryItemProps, Subcategory} from "@/app/categories/types";
-import {useCategoryApi} from "@/app/categories/hooks/use-category-api";
+import {useCategoryApi} from "@/app/categories/hooks/api/use-category-api";
 import {DrawerModal} from "@/app/ui/components/drawer-modal";
 import {Calculator} from "@/app/ui/components/calculator/calculator";
 import {useEditCategory} from "@/app/categories/hooks/use-edit-category";
@@ -13,7 +13,7 @@ import {useMemo, useState} from "react";
 import {AddSubcategoryDrawer} from "./add-subcategory-drawer";
 import {EditSubcategoryDrawer} from "./edit-subcategory-drawer";
 import {useLongPress} from "@/app/hooks/use-long-press";
-import {useSubCategoryApi} from "@/app/categories/hooks/use-subcategory-api";
+import {useSubCategoryApi} from "@/app/categories/hooks/api/use-subcategory-api";
 
 export function CategoryItems() {
     const { data, error, isLoading } = useCategoryApi();

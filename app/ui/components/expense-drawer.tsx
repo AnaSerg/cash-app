@@ -12,6 +12,10 @@ export const ExpenseDrawer = ({ categories }: { categories: CategoryItemProps[] 
             categories.map(cat => ({
                 label: cat.name,
                 value: String(cat.id),
+                subOptions: cat.subcategories?.map(sub => ({
+                    label: sub.name,
+                    value: String(sub.id),
+                }))
             }))
         , [categories]);
 
@@ -48,7 +52,9 @@ export const ExpenseDrawer = ({ categories }: { categories: CategoryItemProps[] 
                 validationMessage,
                 options: categoryOptions,
                 selectedOption: expenseFields.categoryId || null,
+                selectedSubOption: expenseFields.subCategoryId || null,
                 onSelectedOptionChange: (value) => update({ categoryId: value ?? "" }),
+                onSelectedSubOptionChange: (value) => update({ subCategoryId: value ?? "" }),
                 fields,
             }}
         />

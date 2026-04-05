@@ -1,5 +1,5 @@
 import { useDrawerForm } from "@/app/hooks/use-drawer-form";
-import { useSubCategoryApi } from "./use-subcategory-api";
+import { useSubCategoryApi } from "./api/use-subcategory-api";
 import { Subcategory } from "@/app/categories/types";
 
 const validate = (fields: { name: string }) => {

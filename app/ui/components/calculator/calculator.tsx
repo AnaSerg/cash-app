@@ -2,13 +2,13 @@ import { Badge } from "@/components/ui/badge"
 import {NumKeyboard} from "./components/num-keyboard";
 import {LetterKeyboard} from "./components/letter-keyboard";
 import {CalculatorInput} from "@/app/ui/components/calculator/components/calculator-input";
-import {useState} from "react";
-import {Button} from "@/components/ui/button";
-import {Plus} from "lucide-react";
+import {useRef, useState} from "react";
+import {useDragScroll} from "@/app/hooks/use-drag-scroll";
 
 export type Option = {
     label: string;
     value: string;
+    subOptions?: { label: string; value: string }[];
 }
 
 type CalculatorProps = {
@@ -16,7 +16,9 @@ type CalculatorProps = {
     options?: Option[];
     validationMessage?: string | null;
     selectedOption?: string | null;
+    selectedSubOption?: string | null;
     onSelectedOptionChange?: (value: string | null) => void;
+    onSelectedSubOptionChange?: (value: string | null) => void;
 }
 
 export type FieldConfig = {
@@ -34,9 +36,15 @@ export const Calculator = ({
     validationMessage,
     selectedOption,
     onSelectedOptionChange,
+    selectedSubOption,
+    onSelectedSubOptionChange,
 }: CalculatorProps) => {
     const [activeKey, setActiveKey] = useState(fields[0].key);
     const activeField = fields.find(f => f.key === activeKey)!;
+    const optionsRef = useRef<HTMLDivElement>(null);
+    const subOptionsRef = useRef<HTMLDivElement>(null);
+    const optionsScrollHandlers = useDragScroll(optionsRef);
+    const subOptionsScrollHandlers = useDragScroll(subOptionsRef);
 
     return (
         <>
@@ -51,21 +59,49 @@ export const Calculator = ({
                     label={field.label}
                 />
             ))}
-            <div className="flex gap-2 overflow-x-auto pb-1 mt-4 mb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div
+                ref={optionsRef}
+                {...optionsScrollHandlers}
+                data-vaul-no-drag
+                className="flex gap-2 overflow-x-auto pb-1 mt-4 mb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] cursor-grab active:cursor-grabbing"
+            >
                 {options?.map((option) => (
-                    <Badge
-                        key={option.value}
-                        onClick={() => onSelectedOptionChange?.(option.value)}
-                        className={`pt-2 pl-4 pb-2 pr-4 text-sm font-semibold cursor-pointer whitespace-nowrap flex-shrink-0 transition-colors ${
-                            selectedOption === option.value
-                                ? "bg-[#FAF09C]"
-                                : "bg-orange-50"
-                        }`}
-                    >
-                        {option.label}
-                    </Badge>
+                        <Badge
+                            key={option.value}
+                            onClick={() => onSelectedOptionChange?.(option.value)}
+                            className={`pt-2 pl-4 pb-2 pr-4 text-sm font-semibold cursor-pointer whitespace-nowrap flex-shrink-0 transition-colors ${
+                                selectedOption === option.value
+                                    ? "bg-[#FAF09C]"
+                                    : "bg-orange-50"
+                            }`}
+                        >
+                            {option.label}
+                        </Badge>
                 ))}
             </div>
+
+            {options?.find(o => o.value === selectedOption)?.subOptions && (
+                <div
+                    ref={subOptionsRef}
+                    {...subOptionsScrollHandlers}
+                    data-vaul-no-drag
+                    className="flex gap-2 overflow-x-auto pb-1 mb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] cursor-grab active:cursor-grabbing"
+                >
+                    {options.find(o => o.value === selectedOption)!.subOptions!.map((subOption) => (
+                        <Badge
+                            key={subOption.value}
+                            onClick={() => onSelectedSubOptionChange?.(subOption.value)}
+                            className={`pt-2 pl-4 pb-2 pr-4 text-sm font-medium cursor-pointer whitespace-nowrap flex-shrink-0 transition-colors ${
+                                selectedSubOption === subOption.value
+                                    ? "bg-[#FBDCE1]"
+                                    : "bg-orange-50"
+                            }`}
+                        >
+                            {subOption.label}
+                        </Badge>
+                    ))}
+                </div>
+            )}
 
             <div className="flex-shrink-0">
                 {activeField.type === "num"

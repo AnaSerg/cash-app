@@ -2,6 +2,7 @@ import {Item, ItemContent} from "@/components/ui/item";
 import {ProgressBar} from "@/app/ui/components/progress-bar";
 import Link from 'next/link';
 import {formatNumberWithSpace} from "@/app/lib/format-number-with-space";
+import {getCurrentMonth} from "@/lib/utils/get-current-month";
 
 type spentInfoProps = {
     totalSpent: number;
@@ -19,7 +20,7 @@ export function DashboardItem({ totals }: {totals: spentInfoProps}) {
 
                     <div>
                         <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-1">
-                            Расходы за март
+                            Расходы за {getCurrentMonth()}
                         </p>
                         <h3 className="text-4xl font-black text-white leading-none">
                             {formatNumberWithSpace(totalSpent)} ₽

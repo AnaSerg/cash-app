@@ -1,4 +1,4 @@
-import { useExpenseApi } from "./use-expense-api";
+import { useExpenseApi } from "./api/use-expense-api";
 import { parseAmountInput } from "../lib/format-number-with-space";
 import { useDrawerForm } from "./use-drawer-form";
 
@@ -6,6 +6,7 @@ const initialExpenseFields = () => ({
     amount: "",
     comment: "",
     categoryId: "",
+    subCategoryId: "",
 });
 
 export const useAddExpense = (onSuccess?: () => void) => {
@@ -22,12 +23,14 @@ export const useAddExpense = (onSuccess?: () => void) => {
             if (amountMissing) return "Введите сумму расхода";
             if (categoryMissing) return "Выбери категорию";
             return null;
+
         },
         async () => {
             await addExpense({
                 description: fields.comment.trim() || undefined,
                 amount: parseAmountInput(fields.amount),
                 categoryId: Number(fields.categoryId),
+                subCategoryId: Number(fields.subCategoryId),
             });
         },
         onSuccess,

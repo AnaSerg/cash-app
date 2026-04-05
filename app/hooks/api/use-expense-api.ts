@@ -5,6 +5,7 @@ export type CreateExpensePayload = {
     description?: string;
     amount: number;
     categoryId: number;
+    subCategoryId?: number;
 };
 
 export const useExpenseApi = () => {

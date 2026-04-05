@@ -23,9 +23,11 @@ export const POST = async (req: Request) => {
                 description: body.description,
                 amount: Number(body.amount),
                 categoryId: Number(body.categoryId),
-                subcategoryId: Number(body.subcategoryId),
+                subcategoryId: Number(body.subCategoryId) || null,
             }
         });
+
+        console.log(newExpense);
 
         return NextResponse.json(newExpense, { status: 201 });
 
