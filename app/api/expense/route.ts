@@ -23,6 +23,7 @@ export const POST = async (req: Request) => {
                 description: body.description,
                 amount: Number(body.amount),
                 categoryId: Number(body.categoryId),
+                subcategoryId: Number(body.subcategoryId),
             }
         });
 

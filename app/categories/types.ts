@@ -5,6 +5,7 @@ export type CategoryItemProps = {
     remaining?: number;
     totalSpent?: number;
     archived: boolean;
+    subcategories?: Subcategory[];
 }
 
 export type Subcategory = {
