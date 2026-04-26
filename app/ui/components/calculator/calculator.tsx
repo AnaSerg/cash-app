@@ -41,6 +41,10 @@ export const Calculator = ({
 }: CalculatorProps) => {
     const [activeKey, setActiveKey] = useState(fields[0].key);
     const activeField = fields.find(f => f.key === activeKey)!;
+    const selectedCategoryOption =
+        selectedOption != null && selectedOption !== ""
+            ? options?.find((o) => String(o.value) === String(selectedOption))
+            : undefined;
     const optionsRef = useRef<HTMLDivElement>(null);
     const subOptionsRef = useRef<HTMLDivElement>(null);
     const optionsScrollHandlers = useDragScroll(optionsRef);
@@ -70,7 +74,7 @@ export const Calculator = ({
                             key={option.value}
                             onClick={() => onSelectedOptionChange?.(option.value)}
                             className={`pt-2 pl-4 pb-2 pr-4 text-sm font-semibold cursor-pointer whitespace-nowrap flex-shrink-0 transition-colors ${
-                                selectedOption === option.value
+                                String(selectedOption ?? "") === String(option.value)
                                     ? "bg-[#FAF09C]"
                                     : "bg-orange-50"
                             }`}
@@ -80,19 +84,19 @@ export const Calculator = ({
                 ))}
             </div>
 
-            {options?.find(o => o.value === selectedOption)?.subOptions && (
+            {selectedCategoryOption?.subOptions && selectedCategoryOption.subOptions.length > 0 ? (
                 <div
                     ref={subOptionsRef}
                     {...subOptionsScrollHandlers}
                     data-vaul-no-drag
                     className="flex gap-2 overflow-x-auto pb-1 mb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] cursor-grab active:cursor-grabbing"
                 >
-                    {options.find(o => o.value === selectedOption)!.subOptions!.map((subOption) => (
+                    {selectedCategoryOption.subOptions.map((subOption) => (
                         <Badge
-                            key={subOption.value}
+                            key={`${String(selectedCategoryOption.value)}-${subOption.value}`}
                             onClick={() => onSelectedSubOptionChange?.(subOption.value)}
                             className={`pt-2 pl-4 pb-2 pr-4 text-sm font-medium cursor-pointer whitespace-nowrap flex-shrink-0 transition-colors ${
-                                selectedSubOption === subOption.value
+                                String(selectedSubOption ?? "") === String(subOption.value)
                                     ? "bg-[#FBDCE1]"
                                     : "bg-orange-50"
                             }`}
@@ -101,7 +105,7 @@ export const Calculator = ({
                         </Badge>
                     ))}
                 </div>
-            )}
+            ) : null}
 
             <div className="flex-shrink-0">
                 {activeField.type === "num"

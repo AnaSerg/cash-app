@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export default function RootLayout({ children }: { children: React.ReactNode; }) {
     const pathname = usePathname()
-    const hideHeader = ['/profile'].includes(pathname)
+    const hideHeader = ['/profile'].includes(pathname) || pathname.startsWith('/categories/');
 
     return (
         <html lang="en">
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode; })
             <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </head>
-        <body className={`${manrope.className} antialiased mt-3 ml-4 mr-4`}>
+        <body className={`${manrope.className} antialiased mt-1 ml-4 mr-4`}>
             { !hideHeader && <Header /> }
             {children}
         </body>

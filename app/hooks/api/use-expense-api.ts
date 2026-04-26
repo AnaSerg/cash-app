@@ -1,5 +1,5 @@
 import useSWRMutation from "swr/mutation";
-import {mutate} from "swr";
+import useSWR, {mutate} from "swr";
 
 export type CreateExpensePayload = {
     description?: string;
@@ -9,6 +9,17 @@ export type CreateExpensePayload = {
 };
 
 export const useExpenseApi = () => {
+    const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+    const { data: calendarData, error, isLoading } = useSWR(
+        '/api/expense/calendar',
+        fetcher,
+        {
+            revalidateIfStale: false,
+            revalidateOnFocus: false,
+        }
+    );
+
     const { trigger: addExpense } = useSWRMutation<
         void,
         Error,
@@ -17,10 +28,11 @@ export const useExpenseApi = () => {
     >("add-expense", postExpense, {
         onSuccess: () => {
             mutate("/api/category");
+            mutate("/api/expense/calendar");
         },
     });
 
-    return { addExpense };
+    return { calendarData, error, isLoading, addExpense };
 };
 
 async function postExpense(_key: string, { arg }: { arg: CreateExpensePayload }): Promise<void> {

@@ -9,7 +9,7 @@ import {Button} from "@/components/ui/button";
 import React from "react";
 
 export interface DrawerModalProps {
-    buttonText: string;
+    buttonText?: string;
     children: React.ReactNode;
     title?: string;
     accessibilityTitle?: string;
@@ -17,6 +17,7 @@ export interface DrawerModalProps {
     onOpenChange?: (open: boolean) => void;
     onSave?: () => void | Promise<void>;
     saveDisabled?: boolean;
+    backgroundColor?: string;
 }
 
 export function DrawerModal({
@@ -28,26 +29,29 @@ export function DrawerModal({
     children,
     title,
     accessibilityTitle = "Диалоговое окно",
+    backgroundColor,
 }: DrawerModalProps) {
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
-            <DrawerContent className="bg-[#D7D2F1] mt-0">
+            <DrawerContent className={`${backgroundColor ? `bg-[${backgroundColor}]` : "bg-[#D7D2F1]"} mt-0`}>
                 <DrawerHeader>
                     <DrawerTitle className={title ? "text-left" : "sr-only"}>
                         {title ?? accessibilityTitle}
                     </DrawerTitle>
                     {children}
                 </DrawerHeader>
-                <DrawerFooter>
-                    <Button
-                        className="h-12 bg-black text-white text-lg"
-                        type="button"
-                        disabled={saveDisabled}
-                        onClick={() => void onSave?.()}
-                    >
-                        {buttonText}
-                    </Button>
-                </DrawerFooter>
+                {buttonText && (
+                    <DrawerFooter>
+                        <Button
+                            className="h-12 bg-black text-white text-lg"
+                            type="button"
+                            disabled={saveDisabled}
+                            onClick={() => void onSave?.()}
+                        >
+                            {buttonText}
+                        </Button>
+                    </DrawerFooter>
+                )}
             </DrawerContent>
         </Drawer>
     );

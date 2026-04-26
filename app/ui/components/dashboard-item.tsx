@@ -3,6 +3,7 @@ import {ProgressBar} from "@/app/ui/components/progress-bar";
 import Link from 'next/link';
 import {formatNumberWithSpace} from "@/app/lib/format-number-with-space";
 import {getCurrentMonth} from "@/lib/utils/get-current-month";
+import {days} from "effect/Duration";
 
 type spentInfoProps = {
     totalSpent: number;
@@ -13,6 +14,13 @@ type spentInfoProps = {
 export function DashboardItem({ totals }: {totals: spentInfoProps}) {
     const { totalSpent, limit, remaining } = totals;
     const progressBarWidth = totalSpent * 100 / limit || 0;
+
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const daysPassed = now.getDate();
+    const spentPerDayFact = totalSpent / daysPassed;
+    const spentPerDayRecommend = limit / daysInMonth;
+
     return (
         <Link href="/targets/123">
             <Item className="bg-stone-900 mb-6 drop-shadow-md border-0 rounded-2xl" variant="muted">
@@ -34,8 +42,8 @@ export function DashboardItem({ totals }: {totals: spentInfoProps}) {
 
                     <div className="flex justify-between items-end">
                         <div>
-                            <p className="text-xs text-stone-400">Использовано</p>
-                            <p className="text-sm font-semibold text-stone-300">{Math.round(progressBarWidth)}%</p>
+                            <p className="text-xs text-stone-400">Среднее за день (факт/рекомендовано)</p>
+                            <p className="text-sm font-semibold text-stone-300">{`${Math.round(spentPerDayFact)} ₽ / ${Math.round(spentPerDayRecommend)} ₽`}</p>
                         </div>
                         <div className="text-right">
                             <p className="text-xs text-stone-400">Осталось</p>

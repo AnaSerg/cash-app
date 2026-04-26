@@ -21,7 +21,12 @@ export function CategoryItems() {
     if (isLoading) return <Spinner className="size-8" />;
     if (error) return <div>Error: {error.message}</div>;
 
-    if (data.categories.length === 0) {
+    const categories = data?.categories;
+    if (!Array.isArray(categories)) {
+        return <div className="text-sm text-muted-foreground">Нет данных</div>;
+    }
+
+    if (categories.length === 0) {
         return (
             <div className="flex gap-2 justify-center mt-12">
                 <Snail className="text-[#F39A60]"/>
@@ -33,7 +38,7 @@ export function CategoryItems() {
     return (
         <div className="flex w-full max-w-xl flex-col gap-6 mt-6">
             <ItemGroup className="grid grid-cols-1 gap-2">
-                {data.categories.map((category: CategoryItemProps) => (
+                {categories.map((category: CategoryItemProps) => (
                     !category.archived &&
                         <CategoryItem key={category.name} category={category} />
                 ))}

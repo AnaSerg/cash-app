@@ -3,7 +3,18 @@ import useSWR, {mutate} from "swr";
 import {CategoryItemProps} from "@/app/categories/types";
 
 export const useCategoryApi = () => {
-    const fetcher = (url: string) => fetch(url).then(res => res.json());
+    const fetcher = async (url: string) => {
+        const res = await fetch(url);
+        const body = await res.json();
+        if (!res.ok) {
+            throw new Error(
+                typeof body.error === "string"
+                    ? body.error
+                    : "Не удалось загрузить категории",
+            );
+        }
+        return body;
+    };
 
     const { data, error, isLoading } = useSWR(
         '/api/category',

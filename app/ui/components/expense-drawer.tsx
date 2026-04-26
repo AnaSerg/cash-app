@@ -53,7 +53,8 @@ export const ExpenseDrawer = ({ categories }: { categories: CategoryItemProps[] 
                 options: categoryOptions,
                 selectedOption: expenseFields.categoryId || null,
                 selectedSubOption: expenseFields.subCategoryId || null,
-                onSelectedOptionChange: (value) => update({ categoryId: value ?? "" }),
+                onSelectedOptionChange: (value) =>
+                    update({ categoryId: value ?? "", subCategoryId: "" }),
                 onSelectedSubOptionChange: (value) => update({ subCategoryId: value ?? "" }),
                 fields,
             }}

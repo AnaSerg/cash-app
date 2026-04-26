@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import {prisma} from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const GET = async (req: Request) => {
     const now = new Date()
 
@@ -8,66 +10,141 @@ export const GET = async (req: Request) => {
     const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
     try {
-        const categories = await prisma.category.findMany({
-            orderBy: { id: 'asc' },
-            where: {
-                archived: false
-            },
-            select: {
-                id: true,
-                name: true,
-                limit: true,
-                subcategories: {
+        const [categories, monthTotalAgg, archivedCategoryRows] =
+            await Promise.all([
+                prisma.category.findMany({
+                    orderBy: { id: "asc" },
+                    where: { archived: false },
                     select: {
                         id: true,
                         name: true,
-                        expenses: {
-                            where: {
-                                createdAt: { gte: startOfMonth, lt: startOfNextMonth }
-                            },
-                            select: {
-                                amount: true
-                            }
-                        },
-                    }
-                },
-                expenses: {
+                        limit: true,
+                    },
+                }),
+                prisma.expense.aggregate({
                     where: {
-                        createdAt: { gte: startOfMonth, lt: startOfNextMonth }
+                        createdAt: {
+                            gte: startOfMonth,
+                            lt: startOfNextMonth,
+                        },
+                    },
+                    _sum: { amount: true },
+                }),
+                prisma.category.findMany({
+                    where: { archived: true },
+                    select: { id: true },
+                }),
+            ]);
+
+        const totalSpentMonth = Number(monthTotalAgg._sum.amount ?? 0);
+
+        const archivedCategoryIds = archivedCategoryRows.map((c) => c.id);
+        let archivedCategoriesMonthSpent = 0;
+        if (archivedCategoryIds.length > 0) {
+            const archivedMonthAgg = await prisma.expense.aggregate({
+                where: {
+                    createdAt: {
+                        gte: startOfMonth,
+                        lt: startOfNextMonth,
+                    },
+                    categoryId: { in: archivedCategoryIds },
+                },
+                _sum: { amount: true },
+            });
+            archivedCategoriesMonthSpent = Number(
+                archivedMonthAgg._sum.amount ?? 0,
+            );
+        }
+
+        const categoryIds = categories.map((c) => c.id);
+
+        let subcategoriesRows: { id: number; name: string; categoryId: number }[] = [];
+        let monthExpenses: {
+            amount: unknown;
+            categoryId: number;
+            subcategoryId: number | null;
+        }[] = [];
+
+        if (categoryIds.length > 0) {
+            [subcategoriesRows, monthExpenses] = await Promise.all([
+                prisma.subcategory.findMany({
+                    where: { categoryId: { in: categoryIds } },
+                    orderBy: { id: "asc" },
+                    select: {
+                        id: true,
+                        name: true,
+                        categoryId: true,
+                    },
+                }),
+                prisma.expense.findMany({
+                    where: {
+                        categoryId: { in: categoryIds },
+                        createdAt: {
+                            gte: startOfMonth,
+                            lt: startOfNextMonth,
+                        },
                     },
                     select: {
-                        amount: true
-                    }
-                },
+                        amount: true,
+                        categoryId: true,
+                        subcategoryId: true,
+                    },
+                }),
+            ]);
+        }
+
+        const spentByCategoryId = new Map<number, number>();
+        const spentBySubcategoryId = new Map<number, number>();
+        for (const e of monthExpenses) {
+            const amt = Number(e.amount);
+            spentByCategoryId.set(
+                e.categoryId,
+                (spentByCategoryId.get(e.categoryId) ?? 0) + amt,
+            );
+            if (e.subcategoryId != null) {
+                spentBySubcategoryId.set(
+                    e.subcategoryId,
+                    (spentBySubcategoryId.get(e.subcategoryId) ?? 0) + amt,
+                );
             }
+        }
+
+        const subcategoriesByCategoryId = new Map<
+            number,
+            typeof subcategoriesRows
+        >();
+        for (const sub of subcategoriesRows) {
+            const list = subcategoriesByCategoryId.get(sub.categoryId);
+            if (list) list.push(sub);
+            else subcategoriesByCategoryId.set(sub.categoryId, [sub]);
+        }
+
+        const result = categories.map((cat) => {
+            const totalSpent = spentByCategoryId.get(cat.id) ?? 0;
+            const subs = subcategoriesByCategoryId.get(cat.id) ?? [];
+            return {
+                ...cat,
+                totalSpent,
+                remaining: cat.limit - totalSpent,
+                subcategories: subs.map((sub) => ({
+                    id: sub.id,
+                    name: sub.name,
+                    spent: spentBySubcategoryId.get(sub.id) ?? 0,
+                })),
+            };
         });
 
-        const result = categories.map(cat => ({
-            ...cat,
-            totalSpent:
-                cat.expenses.reduce((sum, e) => sum + Number(e.amount), 0) +
-                cat.subcategories.reduce((sum, sub) =>
-                    sum + sub.expenses.reduce((s, e) => s + Number(e.amount), 0), 0),
-            remaining:
-                cat.limit -
-                (cat.expenses.reduce((sum, e) => sum + Number(e.amount), 0) +
-                cat.subcategories.reduce((sum, sub) =>
-                    sum + sub.expenses.reduce((s, e) => s + Number(e.amount), 0), 0)),
-            subcategories: cat.subcategories.map(sub => ({
-                ...sub,
-                spent: sub.expenses.reduce((sum, e) => sum + Number(e.amount), 0)
-            }))
-        }));
-
+        const limitSum = result.reduce((sum, cat) => sum + cat.limit, 0);
         const totals = {
-            totalSpent: result.reduce((sum, cat) => sum + cat.totalSpent, 0),
-            limit: result.reduce((sum, cat) => sum + cat.limit, 0),
-            remaining: result.reduce((sum, cat) => sum + cat.remaining, 0)
+            totalSpent: totalSpentMonth,
+            limit: limitSum,
+            remaining: limitSum - totalSpentMonth,
         };
 
         const finalResult = {
             categories: result,
-            totals: totals
+            totals,
+            archivedCategoriesMonthSpent,
         };
 
         return NextResponse.json(finalResult);

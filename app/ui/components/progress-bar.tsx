@@ -11,7 +11,7 @@ export function ProgressBar({ width, size, variant = "light" }: {
 
     const fillClass = variant === "dark"
         ? "bg-emerald-400"
-        : "bg-black/40";
+        : "bg-amber-400";
 
     const progressBarWidth = width > 100 ? 100 : width;
 
