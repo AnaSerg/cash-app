@@ -19,6 +19,8 @@ model Category {
   limit Int
   expenses Expense[]
   subcategories Subcategory[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   archived Boolean @default(false)
@@ -29,8 +31,10 @@ model Subcategory {
     name String
     @@unique([categoryId, name])
     categoryId Int
+    userId String
     expenses Expense[]
     category Category @relation(fields: [categoryId], references: [id])
+    user User @relation(fields: [userId], references: [id])
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -51,8 +55,23 @@ model Expense {
   date DateTime @default(now())
   categoryId Int
   subcategoryId Int?
+  userId String
   category Category @relation(fields: [categoryId], references: [id])
   subcategory Subcategory? @relation(fields: [subcategoryId], references: [id])
+  user User @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model User {
+    id String @id @default(cuid())
+    name String
+    surname String
+    email String @unique
+    password String
+    expenses Expense[]
+    subcategories Subcategory[]
+    categories Category[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
