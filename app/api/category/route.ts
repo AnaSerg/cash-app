@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {prisma} from "@/lib/prisma";
+import { auth } from "@/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,11 +11,16 @@ export const GET = async (req: Request) => {
     const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const [categories, monthTotalAgg, archivedCategoryRows] =
             await Promise.all([
                 prisma.category.findMany({
                     orderBy: { id: "asc" },
-                    where: { archived: false },
+                    where: { archived: false, userId: session.user.id },
                     select: {
                         id: true,
                         name: true,
@@ -27,11 +33,12 @@ export const GET = async (req: Request) => {
                             gte: startOfMonth,
                             lt: startOfNextMonth,
                         },
+                        userId: session.user.id
                     },
                     _sum: { amount: true },
                 }),
                 prisma.category.findMany({
-                    where: { archived: true },
+                    where: { archived: true, userId: session.user.id },
                     select: { id: true },
                 }),
             ]);
@@ -47,6 +54,7 @@ export const GET = async (req: Request) => {
                         gte: startOfMonth,
                         lt: startOfNextMonth,
                     },
+                    userId: session.user.id,
                     categoryId: { in: archivedCategoryIds },
                 },
                 _sum: { amount: true },
@@ -68,7 +76,7 @@ export const GET = async (req: Request) => {
         if (categoryIds.length > 0) {
             [subcategoriesRows, monthExpenses] = await Promise.all([
                 prisma.subcategory.findMany({
-                    where: { categoryId: { in: categoryIds } },
+                    where: { categoryId: { in: categoryIds }, userId: session.user.id },
                     orderBy: { id: "asc" },
                     select: {
                         id: true,
@@ -78,6 +86,7 @@ export const GET = async (req: Request) => {
                 }),
                 prisma.expense.findMany({
                     where: {
+                        userId: session.user.id,
                         categoryId: { in: categoryIds },
                         createdAt: {
                             gte: startOfMonth,
@@ -158,12 +167,18 @@ export const GET = async (req: Request) => {
 
 export const POST = async (req: Request) => {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const body = await req.json();
 
         const newCategory = await prisma.category.create({
             data: {
                 name: body.name,
                 limit: Number(body.limit),
+                userId: session.user.id
             }
         });
 

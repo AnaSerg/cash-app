@@ -7,6 +7,7 @@ import { Categories } from "@/app/ui/components/categories";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {ExpensesCalendar} from "@/app/ui/components/expenses-calendar";
+import Header from "@/app/ui/components/header/header";
 
 export default function HomePage() {
     const { data, error, isLoading } = useCategoryApi();
@@ -23,6 +24,7 @@ export default function HomePage() {
 
     return (
         <div>
+            <Header />
             <main className="mt-6 relative mb-20">
                 <ExpenseDrawer categories={data.categories} />
                 <Link href="/categories">Категории</Link>

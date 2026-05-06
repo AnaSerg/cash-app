@@ -1,5 +1,6 @@
 import {prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
+import {auth} from "@/auth";
 
 export const GET = async (req: Request, { params }: { params: Promise<{ date: string }> }) => {
     const { date } = await params;
@@ -9,12 +10,18 @@ export const GET = async (req: Request, { params }: { params: Promise<{ date: st
     end.setUTCDate(end.getUTCDate() + 1);
 
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const expenses = await prisma.expense.findMany({
             where: {
                 createdAt: {
                     gte: start,
                     lt: end,
-                }
+                },
+                userId: session.user.id,
             },
             select: {
                 id: true,

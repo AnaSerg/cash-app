@@ -1,5 +1,6 @@
 import useSWRMutation from "swr/mutation";
 import useSWR, {mutate} from "swr";
+import {DayTotal} from "@/app/api/expense/types";
 
 export type CreateExpensePayload = {
     description?: string;
@@ -11,7 +12,7 @@ export type CreateExpensePayload = {
 export const useExpenseApi = () => {
     const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-    const { data: calendarData, error, isLoading } = useSWR(
+    const { data: calendarData, error, isLoading } = useSWR<DayTotal[]>(
         '/api/expense/calendar',
         fetcher,
         {

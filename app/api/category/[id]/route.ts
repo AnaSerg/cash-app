@@ -1,5 +1,6 @@
 import {prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
+import {auth} from "@/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -7,8 +8,13 @@ export const GET = async (_req: Request, { params }: { params: Promise<{ id: str
     const { id } = await params;
     const categoryId = Number(id);
 
+    const session = await auth();
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const category = await prisma.category.findUnique({
-        where: { id: categoryId },
+        where: { id: categoryId, userId: session.user.id },
         select: {
             id: true,
             name: true,
