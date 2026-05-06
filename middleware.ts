@@ -11,7 +11,7 @@ export default auth((req) => {
     }
 
     if (isLoggedIn && isAuthPage) {
-        return Response.redirect(new URL("/dashboard", req.url));
+        return Response.redirect(new URL("/", req.url));
     }
 });
 
