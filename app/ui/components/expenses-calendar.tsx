@@ -3,7 +3,7 @@ import {useState} from "react";
 import {getDateString} from "@/lib/utils/get-date-string";
 import useSWR from "swr";
 import {DrawerModal} from "@/app/ui/components/drawer-modal";
-import {ExpenseItem, ExpenseItemProps} from "@/app/categories/[id]/components/expense-item";
+import {ExpenseItemByDay, ExpenseItemByDayProps} from "@/app/categories/[id]/components/expense-item";
 import {formatNumberWithSpace} from "@/app/lib/format-number-with-space";
 import {formatDate} from "@/lib/utils/format-date";
 import {DayTotal} from "@/app/api/expense/types";
@@ -65,8 +65,8 @@ export const ExpensesCalendar = () => {
                         <p className="text-left text-[#78716c] mb-4">{dayExpenses?.length > 0 && formatDate(dayExpenses[0].createdAt)}</p>
                     </div>
                     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                        {dayExpenses?.length > 0 ? dayExpenses.map((expense: ExpenseItemProps) => (
-                            <ExpenseItem expense={expense} key={expense.id}/>
+                        {dayExpenses?.length > 0 ? dayExpenses.map((expense: ExpenseItemByDayProps) => (
+                            <ExpenseItemByDay expense={expense} key={expense.id}/>
                         )) : (
                             <p>Пока тут пусто</p>
                         )}
@@ -82,6 +82,4 @@ const getTotal = (day: number, data?: DayTotal[]) => {
     return found?.total ?? 0;
 }
 
-/*
-- вынести отдельно вычисление дня ниже
- */
+// TODO: вынести отдельно вычисление дня ниже

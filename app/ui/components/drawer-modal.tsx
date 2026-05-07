@@ -33,7 +33,7 @@ export function DrawerModal({
 }: DrawerModalProps) {
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
-            <DrawerContent className={`${backgroundColor ? `bg-[${backgroundColor}]` : "bg-[#D7D2F1]"} mt-0`}>
+            <DrawerContent className={`${backgroundColor ? `bg-white` : "bg-[#D7D2F1]"} mt-0`}>
                 <DrawerHeader>
                     <DrawerTitle className={title ? "text-left" : "sr-only"}>
                         {title ?? accessibilityTitle}

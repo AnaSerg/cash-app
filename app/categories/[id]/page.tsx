@@ -6,7 +6,7 @@ import {useParams} from "next/navigation";
 import {useCategoryByIdApi} from "./hooks/use-category-by-id-api";
 import {ProgressBar} from "@/app/ui/components/progress-bar";
 import Link from 'next/link';
-import {ExpenseItem, ExpenseItemProps} from "./components/expense-item";
+import {ExpenseItemByCategory, ExpenseItemByCategoryProps} from "./components/expense-item";
 
 
 export default function CategoryPage() {
@@ -18,6 +18,8 @@ export default function CategoryPage() {
     }
 
     const progressBarWidth = category.totalSpent * 100 / category.limit || 0;
+
+    console.log(category);
 
     return (
         <div className="h-screen flex flex-col">
@@ -42,8 +44,8 @@ export default function CategoryPage() {
             <div className="rounded-t-4xl bg-white flex-1 flex flex-col overflow-hidden">
                 <p className="text-sm font-bold text-[#78716c] uppercase tracking-wider p-4 pb-2">История</p>
                 <div className="overflow-y-auto flex-1 px-4">
-                    {category.allExpenses.map((expense: ExpenseItemProps) => (
-                        <ExpenseItem expense={expense} key={expense.id}/>
+                    {category.allExpenses.map((expense: ExpenseItemByCategoryProps) => (
+                        <ExpenseItemByCategory expense={expense} key={expense.id}/>
                     ))}
                 </div>
             </div>

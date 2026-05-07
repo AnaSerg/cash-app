@@ -28,12 +28,12 @@ export const GET = async (_req: Request, { params }: { params: Promise<{ id: str
 
     const [subcategories, expenseRows] = await Promise.all([
         prisma.subcategory.findMany({
-            where: { categoryId: category.id },
+            where: { categoryId: category.id, userId: session.user.id },
             select: { id: true, name: true },
             orderBy: { id: "asc" },
         }),
         prisma.expense.findMany({
-            where: { categoryId: category.id },
+            where: { categoryId: category.id, userId: session.user.id },
             select: {
                 id: true,
                 description: true,
